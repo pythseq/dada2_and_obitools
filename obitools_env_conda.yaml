@@ -1,0 +1,9 @@
+﻿name: obitools
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - virtualenv=16.7.5
+  - sphinx
+  - cython=0.29.13
+  - obitools

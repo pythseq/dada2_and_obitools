@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+*fastq
+*fastq.gz
+*txt
+*dat
+*zip
+*csv
+*fasta
