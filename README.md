@@ -316,8 +316,8 @@ seqtab_avec_chimeres2 <- makeSequenceTable(dadas2)
 
 Create a .csv file containing this table :
 ```
-write.csv(seqtab_avec_chimeres1, "./ASVs_avec_chimeres_loessErrfun.csv")
-write.csv(seqtab_avec_chimeres2, "./ASVs_avec_chimeres_noqualErrfun.csv")
+write.csv(seqtab_avec_chimeres1, "./dada2_and_obitools/ASVs_avec_chimeres_loessErrfun.csv")
+write.csv(seqtab_avec_chimeres2, "./dada2_and_obitools/ASVs_avec_chimeres_noqualErrfun.csv")
 ```
 
 Create a new .fasta file containing the ASVs :
@@ -325,8 +325,8 @@ Create a new .fasta file containing the ASVs :
 uniqueSeqs1 <- getUniques(seqtab_avec_chimeres1)
 uniqueSeqs2 <- getUniques(seqtab_avec_chimeres2)
 # extract the vectors from the table
-uniquesToFasta(uniqueSeqs1, "./ASVs_avec_chimeres_loessErrfun.fasta")
-uniquesToFasta(uniqueSeqs2, "./ASVs_avec_chimeres_noqualErrfun.fasta")
+uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_avec_chimeres_loessErrfun.fasta")
+uniquesToFasta(uniqueSeqs2, "./dada2_and_obitools/ASVs_avec_chimeres_noqualErrfun.fasta")
 # create the fasta file with these vectors
 ```
 
@@ -338,12 +338,12 @@ You can remove the sequences considered as chimeras in the table by directly cre
 seqtab_sans_chimeres1 <- removeBimeraDenovo(seqtab_avec_chimeres1, verbose = T)
 seqtab_sans_chimeres2 <- removeBimeraDenovo(seqtab_avec_chimeres2, verbose = T)
 # the function only extracts bimeras in reality
-write.csv(seqtab_sans_chimeres1, "./ASVs_sans_chimeres_loessErrfun.csv")
-write.csv(seqtab_sans_chimeres2, "./ASVs_sans_chimeres_noqualErrfun.csv")
+write.csv(seqtab_sans_chimeres1, "./dada2_and_obitools/ASVs_sans_chimeres_loessErrfun.csv")
+write.csv(seqtab_sans_chimeres2, "./dada2_and_obitools/ASVs_sans_chimeres_noqualErrfun.csv")
 uniqueSeqs1 <- getUniques(seqtab_sans_chimeres1)
 uniqueSeqs2 <- getUniques(seqtab_sans_chimeres2)
-uniquesToFasta(uniqueSeqs1, "./ASVs_sans_chimeres_loessErrfun.fasta")
-uniquesToFasta(uniqueSeqs2, "./ASVs_sans_chimeres_noqualErrfun.fasta")
+uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_sans_chimeres_loessErrfun.fasta")
+uniquesToFasta(uniqueSeqs2, "./dada2_and_obitools/ASVs_sans_chimeres_noqualErrfun.fasta")
 ```
 
 <a name="step10"></a>

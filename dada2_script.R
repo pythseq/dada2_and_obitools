@@ -120,8 +120,8 @@ seqtab_avec_chimeres1 <- makeSequenceTable(dadas1)
 seqtab_avec_chimeres2 <- makeSequenceTable(dadas2)
 
 ## create the .csv files :
-write.csv(seqtab_avec_chimeres1, "./pipeline_obitools_and_dada2/ASVs_avec_chimeres_loessErrfun.csv")
-write.csv(seqtab_avec_chimeres2, "./pipeline_obitools_and_dada2/ASVs_avec_chimeres_noqualErrfun.csv")
+write.csv(seqtab_avec_chimeres1, "./dada2_and_obitools/ASVs_avec_chimeres_loessErrfun.csv")
+write.csv(seqtab_avec_chimeres2, "./dada2_and_obitools/ASVs_avec_chimeres_noqualErrfun.csv")
 
 ## create the .fasta files :
 uniqueSeqs1 <- getUniques(seqtab_avec_chimeres1)
@@ -129,8 +129,8 @@ uniqueSeqs2 <- getUniques(seqtab_avec_chimeres2)
 
 ## extract the vectors from the table
 
-uniquesToFasta(uniqueSeqs1, ".pipeline_obitools_and_dada2/ASVs_avec_chimeres_loessErrfun.fasta")
-uniquesToFasta(uniqueSeqs2, ".pipeline_obitools_and_dada2/ASVs_avec_chimeres_noqualErrfun.fasta")
+uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_avec_chimeres_loessErrfun.fasta")
+uniquesToFasta(uniqueSeqs2, "./dada2_and_obitools/ASVs_avec_chimeres_noqualErrfun.fasta")
 
 ## create the fasta file with these vectors
 
@@ -141,14 +141,14 @@ uniquesToFasta(uniqueSeqs2, ".pipeline_obitools_and_dada2/ASVs_avec_chimeres_noq
 seqtab_sans_chimeres1 <- removeBimeraDenovo(seqtab_avec_chimeres1, verbose = T)
 seqtab_sans_chimeres2 <- removeBimeraDenovo(seqtab_avec_chimeres2, verbose = T)
 
-write.csv(seqtab_sans_chimeres1, ".pipeline_obitools_and_dada2/ASVs_sans_chimeres_loessErrfun.csv")
-write.csv(seqtab_sans_chimeres2, ".pipeline_obitools_and_dada2/ASVs_sans_chimeres_noqualErrfun.csv")
+write.csv(seqtab_sans_chimeres1, "./dada2_and_obitools/ASVs_sans_chimeres_loessErrfun.csv")
+write.csv(seqtab_sans_chimeres2, "./dada2_and_obitools/ASVs_sans_chimeres_noqualErrfun.csv")
 
 uniqueSeqs1 <- getUniques(seqtab_sans_chimeres1)
 uniqueSeqs2 <- getUniques(seqtab_sans_chimeres2)
 
-uniquesToFasta(uniqueSeqs1, ".pipeline_obitools_and_dada2/ASVs_sans_chimeres_loessErrfun.fasta")
-uniquesToFasta(uniqueSeqs2, ".pipeline_obitools_and_dada2/ASVs_sans_chimeres_noqualErrfun.fasta")
+uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_sans_chimeres_loessErrfun.fasta")
+uniquesToFasta(uniqueSeqs2, "./dada2_and_obitools/ASVs_sans_chimeres_noqualErrfun.fasta")
 
 ########################################################################
 # STEP 8 : Summary of the filtering
