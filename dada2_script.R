@@ -4,7 +4,7 @@
 library("dada2")
 
 ## create a path to your .fastq files :
-path1 <- "./pipeline_obitools_and_dada2/samples"
+path1 <- "./dada2_and_obitools/samples"
 
 ## list the files in your path to verify the .fastq files are in it :
 list.files(path1)
@@ -82,7 +82,7 @@ out <- filterAndTrim(fns, filts1,
 # create a new path to these files, because some files of filts1 may have been
 # completely filtered :
 
-path2 <- "./pipeline_obitools_and_dada2/samples/filtered"
+path2 <- "./dada2_and_obitools/samples/filtered"
 filts2 <- sort(list.files(path2, pattern = ".fastq", full.names = T))
 
 ########################################################################

@@ -29,7 +29,7 @@ This project has for goal to filtrate efficiently eDNA sequences after PCR ampli
 
 For that, we will use the OBITools commands and dada2.
 
-- [OBITools](https://git.metabarcoding.org/obitools/obitools/wikis/home) are commands written in Python
+- [OBITools](https://git.metabarcoding.org/obitools/obitools/wikis/home) are commands written in python
 - [dada2](https://benjjneb.github.io/dada2/tutorial.html) is a pipeline based on R language
 
 In this example, 2 datasets are used, because the study analyzes the sequencing of 2 tiles.
@@ -58,9 +58,9 @@ Reopen your shell and write the following line :
 conda config --set auto_activate_base false
 ```
 
-- Create your new environment obitools from your root in your corresponding path :
+- Create your new environment obitools from your root in your corresponding path. For example :
 ```
-ENVYAML=./pipeline_obitools_and_dada2/obitools_env_conda.yaml
+ENVYAML=./dada2_and_obitools/obitools_env_conda.yaml
 conda env create -f $ENVYAML
 ```
 
@@ -72,6 +72,7 @@ And deactivate it :
 ```
 conda deactivate
 ```
+
 
 ### Preliminary steps for dada2
 
@@ -99,43 +100,37 @@ Activate your environment in your shell :
 conda activate obitools
 ```
 
-Use the function _illuminapairedend_ to make the pair-end sequencing from the forward and reverse sequences you have in your data. In other words, this function takes a forward strand and its reverse corresponding strand, aligns them and merge them considering the overlapping alignment. At the end, you have one sequence, more complete and longer than the forward and reverse strands.
+Use the function illuminapairedend to make the pair-end sequencing from the forward and reverse sequences you have in your data :
 ```
 illuminapairedend --score-min=40 -r mullus_surmuletus_data/200221_SN234_A_L001_AIMI-199_R1.fastq mullus_surmuletus_data/200221_SN234_A_L001_AIMI-199_R2.fastq > AIMI-199.fastq
 illuminapairedend --score-min=40 -r mullus_surmuletus_data/200221_SN234_A_L001_AIMI-200_R1.fastq mullus_surmuletus_data/200221_SN234_A_L001_AIMI-200_R2.fastq > AIMI-200.fastq
-# this function will create a new .fastq file which will contain the sequences
-# after the pair-end of forward and reverse sequences which have a quality 
-# score higher than 40 (-- score-min=40)
+# a new .fastq file is created, it contains the sequences after the pair-end of forward and reverse sequences which have a quality score higher than 40 (-- score-min=40)
 ```
 
-To only conserve the sequences which have been aligned, use _obigrep_ :
+To only conserve the sequences which have been aligned, use obigrep :
 ```
 obigrep -p 'mode!="joined"' AIMI-199.fastq > AIMI-199.ali.fastq
 obigrep -p 'mode!="joined"' AIMI-200.fastq > AIMI-200.ali.fastq
 # -p requires a python expression
-# the unaligned sequences are notified with mode="joined" by illuminapairedend
-# whereas the aligned sequences are notified with mode="aligned"
-# so here python creates new datasets (.ali.fastq) which only contain the 
-# sequences notified "aligned"
+# the unaligned sequences are notified with mode="joined" whereas the aligned sequences are notified with mode="aligned"
+# so here python creates new datasets (.ali.fastq) which only contain the sequences notified "aligned"
 ```
 
 <a name="step2"></a>
 ## STEP 2 : Demultiplexing (OBITools)
 
-The _.txt_ files assign each sequence to its sample and thanks to its tag because each tag corresponds to a reverse or a forward sequence from a sample.
+The .txt files assign each sequence to its sample thanks to its tag because each tag corresponds to a reverse or a forward sequence from a sample.
 
-To be able to compare the sequences next, you need to remove these tags and the primers, using the function _ngsfilter_ :
+To be able to compare the sequences next, you need to remove these tags, and to use the function ngsfilter :
 ```
 ngsfilter -t mullus_surmuletus_data/AIMI_199_corr_tags.txt -u AIMI-199.unidentified.fastq AIMI-199.ali.fastq > AIMI-199.ali.assigned.fastq
 ngsfilter -t mullus_surmuletus_data/AIMI_200_corr_tags.txt -u AIMI-200.unidentified.fastq AIMI-200.ali.fastq > AIMI-200.ali.assigned.fastq
-# new files are created :
-# .unidentified.fastq files contain the sequences that were not assigned
-# whith a correct tag
-# .ali.assigned.fastq files contain the sequences that were assigned with
-# a correct tag, so it contains only the barcode sequences
+# the function creates new files :
+# .unidentified.fastq files contain the sequences that were not assigned whith a correct tag
+# .ali.assigned. fastq files contain the sequences that were assigned with a correct tag, so it contains only the barcode sequences
 ```
 
-Then, separate your _.ali.assigned.fastq_ files depending on their samples in placing them in a dedicated folder (useful for next steps) :
+Then, separate your .ali.assigned.fastq files depending on their samples in placing them in a dedicated folder (useful for next steps) :
 ```
 mkdir samples
 # create the folder
@@ -144,8 +139,8 @@ mv -t samples AIMI-199.ali.assigned.fastq AIMI-200.ali.assigned.fastq
 cd samples
 obisplit -t samples --fastq samples/AIMI-199.ali.assigned.fastq
 obisplit -t samples --fastq samples/AIMI-200.ali.assigned.fastq
-# separation of the files depending on their sample
-mv -t ./pipeline_obitools_and_dada2 AIMI-199.ali.assigned.fastq AIMI-200.ali.assigned.fastq
+# separation of the files depending on their samples
+mv -t ./dada2_and_obitools AIMI-199.ali.assigned.fastq AIMI-200.ali.assigned.fastq
 # removing the original files from the folder
 ```
 
@@ -165,7 +160,7 @@ library("dada2")
 
 Write your path as a shortcut to make it easier to treat your data next :
 ```
-path1 <- "./pipeline_obitools_and_dada2/samples"
+path1 <- "./dada2_and_obitools/samples"
 ```
 
 You can verify your data will be correctly treated with this path:
@@ -176,10 +171,9 @@ list.files(path1)
 Then select the files you want to analyze in your path :
 ```
 fns <- sort(list.files(path1, pattern = ".fastq"", full.names = T))
-# sort is a function that can be used to extract some files, from the list of 
-# the path files here
-# the function will only extract files that end with the pattern chosen and they
-# will be extracted with their full names, that is to say with their path
+# sort is a function that can be used to extract some files, from the list of the path files here
+# the function will only extract files that end with the pattern chosen
+# they will be extracted with their full names, that is to say with their complete path
 ```
 
 And select the part of the files name you want to keep :
@@ -194,7 +188,7 @@ sample.names <- sapply(strsplit(basename(fns), ".fastq"), '[', 1)
 <a name="step4"></a>
 ## STEP 4 : Inspect the quality profiles of the reads (dada2)
 
-The function _plotQualityProfile_ will display a plot representing the quality score for each nucleotides of the reads in the file :
+The function plotQualityProfile will display a graphic representing the quality score for each nucleotides of the reads in the file :
 ```
 plotQualityProfile(fns[10])
 # the plot gives different information :
@@ -203,7 +197,7 @@ plotQualityProfile(fns[10])
 # the lines show summary statistics : mean in green, median in orange, and
 # first and third quartiles in dashed orange
 # the red line indicates the percentage of reads that extend to at least the
-# position corresponding to the abscissa on the horizontal axis
+# position corresponding to the abscissa on the horizontal axe
 ```
 
 ![quality scores plot](quality_scores.png) 
@@ -225,8 +219,8 @@ Here, we can see that the average quality score of the 250 first bases is superi
 Initiate the creation of a new folder to store the filtered sequences generated :
 ```
 filts1 <- file.path(path1, "filtered", paste0(sample.names, ".filt.fastq.gz"))
-# file.path builds the path to the new folder, which will be located in the path
-# already used and which name will be "filtered"
+# file.path builds the path to the new folder, which will be located in the
+# path already used and which name will be "filtered"
 # the files will be named as described before with sample.names, and the pattern
 # ".filt.fastq.gz" will be added
 ```
@@ -243,23 +237,23 @@ out <- filterAndTrim(fns, filts1,
 # reads will be trimmed
 # reads which are shorten than this value are filtered
 # maxN is the number of N tolerated in the sequences after filtering
-# maxEE defines the maximal number of expected errors tolerated in a read, based
+# maxEE define the maximal number of expected errors tolerated in a read, based
 # on the quality score (EE = sum(10^(-Q/10)))
 # compress = T means that the files will be gzipped
 # verbose = T means that information concerning the number of sequences after
 # filtering will be given
 ```
 
-You need to create a new path to these files, because some files of _filts1_ may have been completely filtered, and the next functions won't work :
+You need to create a new path to these files, because some files of filts1 may have been completely filtered, and the next functions won't work :
 ```
-path2 <- "./pipeline_obitools_and_dada2/samples/filtered"
+path2 <- "./dada2_and_obitools/samples/filtered"
 filts2 <- sort(list.files(path2, pattern = ".fastq", full.names = T))
 ```
 
 <a name="step6"></a>
 ## STEP 6 : Dereplication (dada2)
 
-After all these steps, you can eliminate all the amplicons of each sequence from the new _.fastq.gz_ files :
+After all these steps, you can eliminate all the amplicons of each sequence from the new .fastq.gz files :
 ```
 derep <- derepFastq(filts)
 # the function annotates each sequence with his abundance
@@ -268,13 +262,13 @@ derep <- derepFastq(filts)
 <a name="step7"></a>
 ## Step 7 : Error rates learning (dada2)
 
-The _learnErrors_ function is able to distinguish the incorrect sequences from the correct sequences, by estimating the sequencing error rate.
+The learnErrors function is able to distinguish the incorrect sequences from the correct sequences, by estimating the sequencing error rate.
 
 To build the error model, the function alternates estimation of the error rate and inference of sample composition until they converge on a jointly consistent solution.
 
 The algorithm calculates the abundance p-value for each sequence. This p-value is defined by a Poisson distribution, with a parameter correspondig to the rate of amplicons of a sequence i generated from a sequence j. The smallest this p-value is, the more reads of sequence i can be explained by errors from sequence j.
 
-Before that, a partition is built with the most abundant sequence as the core. All the other sequences are compared to this core. The sequence with the smallest p-value is analyzed : if this p-value is inferior than a parameter of the algorithm (OMEGA_A), this sequence become the core of a new partition. The other sequences joins the partition most likely to have produced them. This operation is repeated until there is no p-value which falls under the parameter OMEGA_A.
+Before that, a partition is built with the most abundant sequence as the core. All the other sequences are compared to this core. The sequence with the smallest p-value is analyzed : if this p-value is inferior than a parameter of the algorithm (OMEGA_A), this sequence become the core of a new partition. The other sequences joins the partition most likely to have produced the core. This operation is repeated until there is no p-value which falls under the parameter OMEGA_A.
 
 Then, all the sequences from a partition are transformed into their core, so each partition corresponds to a unique sequence : the ASV.
 ```
@@ -297,11 +291,11 @@ plotErrors(err2, nominalQ = T)
 # quality score
 ```
 
-With _errorEstimationFunction = loessErrfun_ :
+With errorEstimationFunction = loessErrfun :
 
 ![loessErrfun plot](loessErrfun.png)
 
-With _errorEstimationFunction = noqualErrfun_ :
+With errorEstimationFunction = noqualErrfun :
 
 ![noqualErrfun plot](noqualErrfun.png)
 
@@ -320,13 +314,13 @@ seqtab_avec_chimeres1 <- makeSequenceTable(dadas1)
 seqtab_avec_chimeres2 <- makeSequenceTable(dadas2)
 ```
 
-Create a _.csv_ file containing this table :
+Create a .csv file containing this table :
 ```
 write.csv(seqtab_avec_chimeres1, "./ASVs_avec_chimeres_loessErrfun.csv")
 write.csv(seqtab_avec_chimeres2, "./ASVs_avec_chimeres_noqualErrfun.csv")
 ```
 
-Create a new _.fasta_ file containing the ASVs :
+Create a new .fasta file containing the ASVs :
 ```
 uniqueSeqs1 <- getUniques(seqtab_avec_chimeres1)
 uniqueSeqs2 <- getUniques(seqtab_avec_chimeres2)
@@ -339,7 +333,7 @@ uniquesToFasta(uniqueSeqs2, "./ASVs_avec_chimeres_noqualErrfun.fasta")
 <a name="step9"></a>
 ## Step 9 (Optionnal) : Removing chimeras (dada2)
 
-You can remove the sequences considered as chimeras in the table by directly creating a new table using the function _removeBimeraDenovo_, and repeating the same functions to create a new fasta file then :
+You can remove the sequences considered as chimeras in the table by directly creating a new table and .csv file then, and repeating the same functions for create a new fasta file :
 ```
 seqtab_sans_chimeres1 <- removeBimeraDenovo(seqtab_avec_chimeres1, verbose = T)
 seqtab_sans_chimeres2 <- removeBimeraDenovo(seqtab_avec_chimeres2, verbose = T)
@@ -355,7 +349,7 @@ uniquesToFasta(uniqueSeqs2, "./ASVs_sans_chimeres_noqualErrfun.fasta")
 <a name="step10"></a>
 ## Step 10 : Summary of the filtering
 
-We can build the recapitulative tables of the pipeline filters :
+Now we can build the recapitulative tables of the pipeline filters :
 ```
 getN <- function(x) sum(getUniques(x))
 track1 <- cbind(out, sapply(dadas1, getN), rowSums(seqtab_sans_chimeres1))

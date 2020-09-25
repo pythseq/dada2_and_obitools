@@ -5,7 +5,7 @@ conda config --set auto_activate_base false
 ########################################################################
 #STEP 1 : Create a new environment obitools
 
-ENVYAML=./pipeline_obitools_and_dada2/obitools_env_conda.yaml
+ENVYAML=./dada2_and_obitools/obitools_env_conda.yaml
 conda env create -f $ENVYAML
 
 ########################################################################
@@ -68,6 +68,6 @@ obisplit -t samples --fastq AIMI-200.ali.assigned.fastq
 
 ## separation of the files depending on their sample
 
-mv -t ./pipeline_obitools_and_dada2 AIMI-199.ali.assigned.fastq AIMI-200.ali.assigned.fastq
+mv -t ./dada2_and_obitools AIMI-199.ali.assigned.fastq AIMI-200.ali.assigned.fastq
 
 ## removing the original files from the folder
