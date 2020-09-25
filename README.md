@@ -137,8 +137,8 @@ mkdir samples
 mv -t samples AIMI-199.ali.assigned.fastq AIMI-200.ali.assigned.fastq
 # place the latests .fastq files in the folder
 cd samples
-obisplit -t samples --fastq samples/AIMI-199.ali.assigned.fastq
-obisplit -t samples --fastq samples/AIMI-200.ali.assigned.fastq
+obisplit -t samples --fastq experiment/AIMI-199.ali.assigned.fastq
+obisplit -t samples --fastq experiment/AIMI-200.ali.assigned.fastq
 # separation of the files depending on their samples
 mv -t ./dada2_and_obitools AIMI-199.ali.assigned.fastq AIMI-200.ali.assigned.fastq
 # removing the original files from the folder
