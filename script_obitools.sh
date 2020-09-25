@@ -63,8 +63,8 @@ mv -t samples AIMI-199.ali.assigned.fastq AIMI-200.ali.assigned.fastq
 ## place the latests .fastq files in the folder
 
 cd samples
-obisplit -t samples --fastq AIMI-199.ali.assigned.fastq
-obisplit -t samples --fastq AIMI-200.ali.assigned.fastq
+obisplit -t experiment --fastq AIMI-199.ali.assigned.fastq
+obisplit -t experiment --fastq AIMI-200.ali.assigned.fastq
 
 ## separation of the files depending on their sample
 
