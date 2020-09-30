@@ -17,25 +17,25 @@ unzip mullus_surmuletus_data.zip
 ## activate your environment :
 conda activate obitools
 
-## use the function illuminapairedend to make the pair-end sequencing from
+## use the function "illuminapairedend" to make the pair-end sequencing from
 ## the forward and reverse sequences you have in your data :
 illuminapairedend --score-min=40 -r mullus_surmuletus_data/Med_R1.fastq mullus_surmuletus_data/Med_R2.fastq > Med.fastq
 illuminapairedend --score-min=40 -r mullus_surmuletus_data/Atl_R1.fastq mullus_surmuletus_data/Atl_R2.fastq > Atl.fastq
 
-## this function creates a new .fastq file which will contain the sequences
+## this function creates a new ".fastq file" which will contain the sequences
 ## after the pair-end of forward and reverse sequences which have a quality 
 ## score higher than 40 ("-- score-min=40")
 
-## to only conserve the sequences which have been aligned, use obigrep :
+## to only conserve the sequences which have been aligned, use "obigrep" :
 obigrep -p 'mode!="joined"' Med.fastq > Med.ali.fastq
 obigrep -p 'mode!="joined"' Atl.fastq > Atl.ali.fastq
 
-## -p requires a python expression
+## "-p" requires a python expression
 
-## the unaligned sequences are notified with mode="joined" by illuminapairedend 
+## the unaligned sequences are notified with mode="joined" by "illuminapairedend"
 ## whereas the aligned sequences are notified with mode="aligned"
 
-## so here python creates new datasets (.ali.fastq) which only contain the
+## so here python creates new datasets (".ali.fastq") which only contain the
 ## sequences notified "aligned"
 
 ########################################################################
@@ -52,7 +52,7 @@ ngsfilter -t mullus_surmuletus_data/Atl_corr_tags.txt -u Atl.unidentified.fastq 
 ## ".ali.assigned.fastq" files contain the sequences that were assigned with
 ## a correct tag, so it contains only the barcode sequences
 
-## separate your .ali.assigned.fastq files depending on their samples, 
+## separate your ".ali.assigned.fastq" files depending on their samples, 
 ## in placing them in a  dedicated folder (useful for next steps) :
 mkdir samples
 
@@ -60,7 +60,7 @@ mkdir samples
 
 mv -t samples Med.ali.assigned.fastq Atl.ali.assigned.fastq
 
-## place the latests .fastq files in the folder
+## place the latests ".fastq" files in the folder
 
 cd samples
 obisplit -t sample --fastq Med.ali.assigned.fastq

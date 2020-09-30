@@ -50,10 +50,10 @@ bash Anaconda3-2020.07-Linux-x86_64.sh
 Then, close your shell and reopen it.
 Verify conda is correctly installed. It should be here :
 ```
-/~/anaconda3/bin/conda
+~/anaconda3/bin/conda
 ```
 
-Reopen your shell and write the following line :
+Write the following line :
 ```
 conda config --set auto_activate_base false
 ```
@@ -126,8 +126,8 @@ To be able to compare the sequences next, you need to remove tags and primers, a
 ngsfilter -t mullus_surmuletus_data/Med_corr_tags.txt -u Med.unidentified.fastq Med.ali.fastq > Med.ali.assigned.fastq
 ngsfilter -t mullus_surmuletus_data/Atl_corr_tags.txt -u Atl.unidentified.fastq Atl.ali.fastq > Atl.ali.assigned.fastq
 # the function creates new files :
-# .unidentified.fastq files contain the sequences that were not assigned whith a correct tag
-# .ali.assigned. fastq files contain the sequences that were assigned with a correct tag, so it contains only the barcode sequences
+# ".unidentified.fastq" files contain the sequences that were not assigned whith a correct tag
+# ".ali.assigned.fastq" files contain the sequences that were assigned with a correct tag, so they contain only the barcode sequences
 ```
 
 Then, separate your _.ali.assigned.fastq_ files depending on their samples in placing them in a dedicated folder (useful for next steps) :
@@ -187,12 +187,9 @@ The function _plotQualityProfile_ will display a graphic representing the qualit
 ```
 plotQualityProfile(fns[10])
 # the plot gives different information :
-# the grey-scale represents the quality score frequency at each base position
-# on the sequences : darker is the plot, higher is the frequency
-# the lines show summary statistics : mean in green, median in orange, and
-# first and third quartiles in dashed orange
-# the red line indicates the percentage of reads that extend to at least the
-# position corresponding to the abscissa on the horizontal axe
+# the grey-scale represents the quality score frequency at each base position on the sequences : darker is the plot, higher is the frequency
+# the lines show summary statistics : mean in green, median in orange, and first and third quartiles in dashed orange
+# the red line indicates the percentage of reads that extend to at least the position corresponding to the abscissa on the horizontal axe
 ```
 
 ![quality scores plot](quality_scores.png) 
@@ -214,10 +211,8 @@ Here, we can see that the average quality score of the 250 first bases is superi
 Initiate the creation of a new folder to store the filtered sequences generated :
 ```
 filts <- file.path(path, "filtered", paste0(sample.names, ".filt.fastq.gz"))
-# "file.path" builds the path to the new folder, which will be located in the
-# path already used and which name will be "filtered"
-# the files will be named as described before with sample.names, and the pattern
-# ".filt.fastq.gz" will be added
+# "file.path" builds the path to the new folder, which will be located in the path already used and which name will be "filtered"
+# the files are named as described before with sample.names, and the pattern ".filt.fastq.gz" will be added
 ```
 
 These files are created after trimming and filtering with different criteria :
@@ -228,15 +223,12 @@ out <- filterAndTrim(fns, filts,
                      maxEE = 1,
                      compress = T,
                      verbose = T)
-# "truncLen" value is chosen considering the marker length and define were the
-# reads will be trimmed
+# "truncLen" value is chosen considering the marker length and define were the reads will be trimmed
 # reads which are shorten than this value are filtered
 # "maxN" is the number of N tolerated in the sequences after filtering
-# "maxEE" define the maximal number of expected errors tolerated in a read, based
-# on the quality score (EE = sum(10^(-Q/10)))
+# "maxEE" define the maximal number of expected errors tolerated in a read, based on the quality score (EE = sum(10^(-Q/10)))
 # "compress = T" means that the files will be gzipped
-# "verbose = T" means that information concerning the number of sequences after
-# filtering will be given
+# "verbose = T" means that information concerning the number of sequences after filtering will be given
 ```
 
 <a name="step6"></a>
@@ -255,7 +247,7 @@ The _learnErrors_ function is able to distinguish the incorrect sequences from t
 
 To build the error model, the function alternates estimation of the error rate and inference of sample composition until they converge on a jointly consistent solution.
 
-The algorithm calculates the abundance p-value for each sequence. This p-value is defined by a Poisson distribution, with a parameter correspondig to the rate of amplicons of a sequence i generated from a sequence j. The smallest this p-value is, the more reads of sequence i can be explained by errors from sequence j.
+The algorithm calculates the abundance p-value for each sequence. This p-value is defined by a Poisson distribution, with a parameter correspondig to the rate of amplicons of a sequence i generated from a sequence j.
 
 Before that, a partition is built with the most abundant sequence as the core. All the other sequences are compared to this core. The sequence with the smallest p-value is analyzed : if this p-value is inferior than a parameter of the algorithm (OMEGA_A), this sequence become the core of a new partition. The other sequences joins the partition most likely to have produced the core. This operation is repeated until there is no p-value which falls under the parameter *OMEGA_A*.
 
@@ -263,9 +255,7 @@ Then, all the sequences from a partition are transformed into their core, so eac
 ```
 err1 <- learnErrors(derep, randomize = T, errorEstimationFunction = loessErrfun)
 err2 <- learnErrors(derep, randomize = T, errorEstimationFunction = noqualErrfun)
-# "errorEstimationFunction" can take the value "loessErrfun" if you want to use
-# the quality score of your sequence to build the model, or "noqualErrfun" if
-# you don't want it
+# "errorEstimationFunction" can take the value "loessErrfun" if you want to use the quality score of your sequence to build the model, or "noqualErrfun" if you don't want it
 ```
 
 You can plot the estimated error rates :
@@ -274,10 +264,8 @@ plotErrors(err1, nominalQ = T)
 plotErrors(err2, nominalQ = T)
 # the error rates of each possible base transition are displayed
 # black dots are the observed error rates for each consensus quality score
-# the black line follows these dots, showing the estimated error rates after
-# convergence of the algorithm
-# the red line represents the error rates expected with the definition of
-# quality score
+# the black line follows these dots, showing the estimated error rates after convergence of the algorithm
+# the red line represents the error rates expected with the definition of quality score
 ```
 
 With *errorEstimationFunction = loessErrfun* :

@@ -3,10 +3,10 @@
 ## load the package :
 library("dada2")
 
-## create a path to your .fastq files :
+## create a path to your ".fastq" files :
 path <- "./dada2_and_obitools/samples"
 
-## select the .fastq files you want to analyze :
+## select the ".fastq" files you want to analyze :
 fns <- sort(list.files(path, pattern = ".fastq", full.names = T))
 
 ## "sort" is a function that can be used to extract some files, from the list of 
@@ -46,13 +46,13 @@ plotQualityProfile(fns[10])
 ## begin the creation of the new files and folder :
 filts <- file.path(path, "filtered", paste0(sample.names, ".filt.fastq.gz"))
 
-## file.path builds the path to the new folder, which will be located in the
+## "file.path" builds the path to the new folder, which will be located in the
 ## path already used and which name will be "filtered"
 
-## the files will be named as described before with sample.names, and the
+## the files will be named as described before with "sample.names", and the
 ## pattern ".filt.fastq.gz" will be added
 
-## from the ".fastq files" of fns, create the new ".fastq" files of "filts" after
+## from the ".fastq files" of "fns", create the new ".fastq" files of "filts" after
 ## filtering and trimming :
 out <- filterAndTrim(fns, filts,
                      truncLen = 234,
@@ -128,5 +128,5 @@ seqtab_sans_chimeres2 <- removeBimeraDenovo(seqtab_avec_chimeres2, verbose = T)
 uniqueSeqs1 <- getUniques(seqtab_sans_chimeres1)
 uniqueSeqs2 <- getUniques(seqtab_sans_chimeres2)
 
-uniquesToFasta(uniqueSeqs1, "D:/projets/dada2_and_obitools/ASVs_sans_chimeres_loessErrfun.fasta")
-uniquesToFasta(uniqueSeqs2, "D:/projets/dada2_and_obitools/ASVs_sans_chimeres_noqualErrfun.fasta")
+uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_sans_chimeres_loessErrfun.fasta")
+uniquesToFasta(uniqueSeqs2, "./dada2_and_obitools/ASVs_sans_chimeres_noqualErrfun.fasta")
