@@ -218,7 +218,7 @@ filts <- file.path(path, "filtered", paste0(sample.names, ".filt.fastq.gz"))
 These files are created after trimming and filtering with different criteria :
 ```
 out <- filterAndTrim(fns, filts,
-                     truncLen = 234,
+                     truncLen = 235,
                      maxN = 0,
                      maxEE = 1,
                      compress = T,

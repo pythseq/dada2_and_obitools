@@ -55,7 +55,7 @@ filts <- file.path(path, "filtered", paste0(sample.names, ".filt.fastq.gz"))
 ## from the ".fastq files" of "fns", create the new ".fastq" files of "filts" after
 ## filtering and trimming :
 out <- filterAndTrim(fns, filts,
-                     truncLen = 234,
+                     truncLen = 235,
                      maxN = 0,
                      maxEE = 1,
                      compress = T,
