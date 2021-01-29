@@ -88,7 +88,7 @@ install.packages("dada2")
 If you have troubles to install the package, follow the instructions [here](https://benjjneb.github.io/dada2/dada-installation.html).
 
 <a name="step1"></a>
-## STEP 1 : Pair-end sequencing (OBITools)
+## STEP 1 : Pair-ended merging
 
 First, unzip your data in your shell if you need :
 ```
@@ -100,51 +100,47 @@ Activate your environment in your shell :
 conda activate obitools
 ```
 
-Use the function _illuminapairedend_ to make the pair-end sequencing from the forward and reverse strands of the sequences you have in your data. In other words, the function aligns the complementary strands in order to get a longer sequence. In fact, during PCR, the last bases are rarely correctly sequenced. So having the forward and the reverse strands allows to lenghten the sequence, thanks to the beginning of the reverse strand, which is usually correctly sequenced.
+Use the command _illuminapairedend_ to make the pair-ended merging from the forward and reverse strands of the sequences you have in your data. The command aligns the complementary strands in order to get a longer sequence. In fact, after PCR, the last bases are rarely correctly sequenced. So having the forward and the reverse strands allows to lenghten the sequence, thanks to the beginning of the reverse strand, which is usually correctly sequenced.
 ```
-illuminapairedend --score-min=40 -r mullus_surmuletus_data/Med_R1.fastq mullus_surmuletus_data/Med_R2.fastq > Med.fastq
-illuminapairedend --score-min=40 -r mullus_surmuletus_data/Atl_R1.fastq mullus_surmuletus_data/Atl_R2.fastq > Atl.fastq
-# a new .fastq file is created, it contains the sequences after the pair-end of forward and reverse sequences which have a quality score higher than 40 (-- score-min=40)
+illuminapairedend --score-min=40 -r mullus_surmuletus_data/Aquarium_2_R1.fastq mullus_surmuletus_data/Aquarium_2_R2.fastq > Aquarium_2.fastq
+# a new .fastq file is created, it contains the sequences after the merging of forward and reverse strands
+# alignments which have a quality score higher than 40 (-- score-min=40) are merged and annotated "aligned", while alignemnts with a lower quality score are concatenated and annotated "joined"
 ```
 
-To only conserve the sequences which have been aligned, use _obigrep_ :
+To only conserve the sequences which have been merged, use _obigrep_ :
 ```
-obigrep -p 'mode!="joined"' Med.fastq > Med.ali.fastq
-obigrep -p 'mode!="joined"' Atl.fastq > Atl.ali.fastq
+obigrep -p 'mode!="joined"' Aquarium_2.fastq > Aquarium_2.ali.fastq
 # -p requires a python expression
-# the unaligned sequences are notified with mode="joined" whereas the aligned sequences are notified with mode="aligned"
-# so here python creates new datasets (.ali.fastq) which only contain the sequences notified "aligned"
+# python creates a new dataset (.ali.fastq) which only contains the sequences annotated "aligned"
 ```
 
 <a name="step2"></a>
-## STEP 2 : Demultiplexing (OBITools)
+## STEP 2 : Demultiplexing
 
-The _.txt_ files assign each sequence to its sample thanks to its tag because each tag corresponds to a reverse or a forward sequence from a sample.
+A _.txt_ file assigns each sequence to its sample thanks to its tag, because each tag corresponds to a reverse or a forward sequence from a sample.
 
-To be able to compare the sequences next, you need to remove tags and primers, and to use the function _ngsfilter_ :
+To compare the sequences next, you need to remove the tags and the primers, by using the _ngsfilter_ command :
 ```
-ngsfilter -t mullus_surmuletus_data/Med_corr_tags.txt -u Med.unidentified.fastq Med.ali.fastq > Med.ali.assigned.fastq
-ngsfilter -t mullus_surmuletus_data/Atl_corr_tags.txt -u Atl.unidentified.fastq Atl.ali.fastq > Atl.ali.assigned.fastq
-# the function creates new files :
-# ".unidentified.fastq" files contain the sequences that were not assigned whith a correct tag
-# ".ali.assigned.fastq" files contain the sequences that were assigned with a correct tag, so they contain only the barcode sequences
+ngsfilter -t mullus_surmuletus_data/Med_corr_tags.txt -u Aquarium_2.unidentified.fastq Aquarium_2.ali.fastq > Aquarium_2.ali.assigned.fastq
+# the command creates new files :
+# ".unidentified.fastq" file contains the sequences that were not assigned whith a correct tag
+# ".ali.assigned.fastq" file contains the sequences that were assigned with a correct tag, so they contain only the barcode sequences
 ```
 
 Then, separate your _.ali.assigned.fastq_ files depending on their samples in placing them in a dedicated folder (useful for next steps) :
 ```
 mkdir samples
 # create the folder
-mv -t samples Med.ali.assigned.fastq Atl.ali.assigned.fastq
-# place the latests .fastq files in the folder
+mv -t samples Aquarium_2.ali.assigned.fastq
+# place the latests ".fastq" files in the folder
 cd samples
-obisplit -t samples --fastq sample/Med.ali.assigned.fastq
-obisplit -t samples --fastq sample/Atl.ali.assigned.fastq
-# separation of the files depending on their samples
-mv -t ./dada2_and_obitools Med.ali.assigned.fastq Atl.ali.assigned.fastq
-# removing the original files from the folder
+obisplit -t samples --fastq sample/Aquarium_2.ali.assigned.fastq
+# separate the files depending on their samples
+mv -t ./dada2_and_obitools Aquarium_2.ali.assigned.fastq
+# remove the original files from the folder
 ```
 
-Now you have as many files as samples, containing pair-ended and demultiplexed sequences.
+Now you have as many files as samples, containing merged pair-ended and demultiplexed sequences.
 
 <a name="step3"></a>
 ## STEP 3 : Be prepared (dada2)
