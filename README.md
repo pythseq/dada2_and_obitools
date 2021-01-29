@@ -11,7 +11,7 @@ _________________________________
   * [Installation](#installation)
     + [Preliminary steps for OBITools](#preliminary-steps-for-obitools)
     + [Preliminary steps for dada2](#preliminary-steps-for-dada2)
-  * [STEP 1 : Pair-end sequencing (OBITools)](#step1)
+  * [STEP 1 : Pair-ended merging (OBITools)](#step1)
   * [STEP 2 : Demultiplexing (OBITools)](#step2)
   * [STEP 3 : Be prepared (dada2)](#step3)
   * [STEP 4 : Inspect the quality profiles of the reads (dada2)](#step4)
@@ -19,7 +19,7 @@ _________________________________
   * [STEP 6 : Dereplication (dada2)](#step6)
   * [STEP 7 : Error rates learning (dada2)](#step7)
   * [STEP 8 : Generate your final files (dada2)](#step8)
-  * [STEP 9 (Optionnal) : Removing chimeras (dada2)](#step9)
+  * [STEP 9 (Optionnal) : Bimeras removal (dada2)](#step9)
   * [STEP 10 : Analyse your results](#step10)
 _________________________________
 
@@ -145,7 +145,7 @@ Now you have as many files as samples, containing merged pair-ended and demultip
 <a name="step3"></a>
 ## STEP 3 : Be prepared (dada2)
 
-Now that your data have been paired-end and demultiplexed, they have the correct format for dada2.
+Now that your data have been paired-ended merged and demultiplexed, they have the correct format for dada2.
 
 Quit your shell and open your IDE for R.
 
@@ -163,7 +163,7 @@ Then select the files you want to analyze in your path :
 ```
 fns <- sort(list.files(path, pattern = ".fastq"", full.names = T))
 # "sort" is a function that can be used to extract some files, from the list of the path files here
-# the function only extracts files that end with the pattern chosen
+# the function only extracts files that end with the chosen pattern
 # they are extracted with their whole path
 ```
 
@@ -187,6 +187,8 @@ plotQualityProfile(fns[10])
 # the lines show summary statistics : mean in green, median in orange, and first and third quartiles in dashed orange
 # the red line indicates the percentage of reads that extend to at least the position corresponding to the abscissa on the horizontal axe
 ```
+
+Here is an example :
 
 ![quality scores plot](quality_scores.png) 
 
@@ -230,7 +232,7 @@ out <- filterAndTrim(fns, filts,
 <a name="step6"></a>
 ## STEP 6 : Dereplication (dada2)
 
-After all these steps, you can eliminate all the amplicons of each sequence from the new _.fastq.gz_ files :
+After all these steps, you can eliminate all the replications of each sequence from the new _.fastq.gz_ files :
 ```
 derep <- derepFastq(filts)
 # the function annotates each sequence with his abundance
@@ -249,33 +251,26 @@ Before that, a partition is built with the most abundant sequence as the core. A
 
 Then, all the sequences from a partition are transformed into their core, so each partition corresponds to a unique sequence : the ASV.
 ```
-err1 <- learnErrors(derep, randomize = T, errorEstimationFunction = loessErrfun)
-err2 <- learnErrors(derep, randomize = T, errorEstimationFunction = noqualErrfun)
-# "errorEstimationFunction" can take the value "loessErrfun" if you want to use the quality score of your sequence to build the model, or "noqualErrfun" if you don't want it
+err <- learnErrors(derep, randomize = T)
 ```
 
 You can plot the estimated error rates :
 ```
-plotErrors(err1, nominalQ = T)
-plotErrors(err2, nominalQ = T)
+plotErrors(err, nominalQ = T)
 # the error rates of each possible base transition are displayed
 # black dots are the observed error rates for each consensus quality score
 # the black line follows these dots, showing the estimated error rates after convergence of the algorithm
 # the red line represents the error rates expected with the definition of quality score
 ```
 
-With *errorEstimationFunction = loessErrfun* :
+Here is an example :
 
 ![loessErrfun plot](loessErrfun.png)
 
-With *errorEstimationFunction = noqualErrfun* :
-
-![noqualErrfun plot](noqualErrfun.png)
 
 Then, eliminate the false sequences identified by the algorithm to conserve only the ASVs :
 ```
-dadas1 <- dada(derep, err1)
-dadas2 <- dada(derep, err2)
+dadas <- dada(derep, err)
 ```
 
 <a name="step8"></a>
@@ -283,32 +278,26 @@ dadas2 <- dada(derep, err2)
 
 Construct a sequence table with your sequences filtered :
 ```
-seqtab_avec_chimeres1 <- makeSequenceTable(dadas1)
-seqtab_avec_chimeres2 <- makeSequenceTable(dadas2)
+seqtab_with_bimeras <- makeSequenceTable(dadas)
 ```
 
 Create a new .fasta file containing the ASVs :
 ```
-uniqueSeqs1 <- getUniques(seqtab_avec_chimeres1)
-uniqueSeqs2 <- getUniques(seqtab_avec_chimeres2)
+uniqueSeqs <- getUniques(seqtab_with_bimeras)
 # extract the vectors from the table
-uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_avec_chimeres_loessErrfun.fasta")
-uniquesToFasta(uniqueSeqs2, "./dada2_and_obitools/ASVs_avec_chimeres_noqualErrfun.fasta")
+uniquesToFasta(uniqueSeqs, "./dada2_and_obitools/ASVs_with_bimeras.fasta")
 # create the fasta file with these vectors
 ```
 
 <a name="step9"></a>
-## STEP 9 (Optionnal) : Removing chimeras (dada2)
+## STEP 9 (Optionnal) : Bimeras removal (dada2)
 
-You can remove the sequences considered as chimeras in the table by directly creating a new table, and repeating the same functions for create a new fasta file :
+You can remove the sequences considered as bimeras in the table by directly creating a new table, and repeating the same functions for create a new fasta file :
+(Bimeras are two-parent chimeric sequences. Chimeric sequences, or PCR-mediated recombinant, are sequences built from a merging of different closely related DNA templates during PCR.)
 ```
-seqtab_sans_chimeres1 <- removeBimeraDenovo(seqtab_avec_chimeres1, verbose = T)
-seqtab_sans_chimeres2 <- removeBimeraDenovo(seqtab_avec_chimeres2, verbose = T)
-# the function only extracts bimeras in reality
-uniqueSeqs1 <- getUniques(seqtab_sans_chimeres1)
-uniqueSeqs2 <- getUniques(seqtab_sans_chimeres2)
-uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_sans_chimeres_loessErrfun.fasta")
-uniquesToFasta(uniqueSeqs2, "./dada2_and_obitools/ASVs_sans_chimeres_noqualErrfun.fasta")
+seqtab_with_bimeras <- removeBimeraDenovo(seqtab_without_bimeras, verbose = T)
+uniqueSeqs <- getUniques(seqtab_without_bimeras)
+uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_without_bimeras.fasta")
 ```
 
 <a name="step10"></a>

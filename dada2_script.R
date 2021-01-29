@@ -9,11 +9,11 @@ path <- "./dada2_and_obitools/samples"
 ## select the ".fastq" files you want to analyze :
 fns <- sort(list.files(path, pattern = ".fastq", full.names = T))
 
-## "sort" is a function that can be used to extract some files, from the list of 
-## the path files here
+## "sort" is a function that can be used to extract some files, from
+## the list of the path files here
 
-## the function only extracts files that end with the pattern chosen and
-## they are extracted with their whole path
+## the function only extracts files that end with the chosen pattern
+## and they are extracted with their whole path
 
 ## then you can only keep the part of your files name you want :
 sample.names <- sapply(strsplit(basename(fns), ".fastq"), '[', 1)
@@ -33,12 +33,13 @@ sample.names <- sapply(strsplit(basename(fns), ".fastq"), '[', 1)
 plotQualityProfile(fns[10])
 
 ## the plot gives different information :
-## the grey-scale represents the quality score frequency at each base position
-## on the sequences : darker is the plot, higher is the frequency
-## the lines show summary statistics : mean in green, median in orange, and
-## first and third quartiles in dashed orange
-## the red line indicates the percentage of reads that extend to at least the
-## position corresponding to the abscissa on the horizontal axis
+## the grey-scale represents the quality score frequency at each base
+## position on the sequences : darker is the plot, higher is the
+## frequency
+## the lines show summary statistics : mean in green, median in orange,
+## and first and third quartiles in dashed orange
+## the red line indicates the percentage of reads that extend to at least
+## the position corresponding to the abscissa on the horizontal axis
 
 ########################################################################
 #STEP 3 : Filtering & Trimming
@@ -46,14 +47,14 @@ plotQualityProfile(fns[10])
 ## begin the creation of the new files and folder :
 filts <- file.path(path, "filtered", paste0(sample.names, ".filt.fastq.gz"))
 
-## "file.path" builds the path to the new folder, which will be located in the
-## path already used and which name will be "filtered"
+## "file.path" builds the path to the new folder, which will be located
+## in the path already used and which name will be "filtered"
 
-## the files will be named as described before with "sample.names", and the
-## pattern ".filt.fastq.gz" will be added
+## the files will be named as described before with "sample.names", and
+## the pattern ".filt.fastq.gz" will be added
 
-## from the ".fastq files" of "fns", create the new ".fastq" files of "filts" after
-## filtering and trimming :
+## from the ".fastq files" of "fns", create the new ".fastq" files of
+## "filts" after filtering and trimming :
 out <- filterAndTrim(fns, filts,
                      truncLen = 235,
                      maxN = 0,
@@ -61,24 +62,25 @@ out <- filterAndTrim(fns, filts,
                      compress = T,
                      verbose = T)
 
-## "truncLen" value is chosen considering the marker length and define were the
-## reads will be trimmed
+## "truncLen" value is chosen considering the marker length and define
+## were the reads will be trimmed
 ## reads which are shorten than this value are filtered
 
-## "maxN" is the number of N tolerated in the sequences after filtering
+## "maxN" is the number of N tolerated in the sequences after
+## filtering
 
-## "maxEE" defines the maximal number of expected errors tolerated in a read,
-## based on the quality score (EE = sum(10^(-Q/10)))
+## "maxEE" defines the maximal number of expected errors tolerated in a
+## read, based on the quality score (EE = sum(10^(-Q/10)))
 
 ## "compress = T" means that the files will be gzipped
 
 ## "verbose = T" means that information concerning the number of sequences after
-## filtering will be given
+## sequences after filtering will be given
 
 ########################################################################
 #STEP 4 : Dereplication
 
-## "derepFastq" function eliminates the amplicons of each sequence in the files
+## "derepFastq" function eliminates all the replications of each sequence in the files
 derep <- derepFastq(filts)
 
 ## the function annotates each sequence with his abundance
@@ -87,46 +89,33 @@ derep <- derepFastq(filts)
 #STEP 5 : Error rates learning
 
 ## generate the error model :
-err1 <- learnErrors(derep, randomize = T, errorEstimationFunction = loessErrfun)
-err2 <- learnErrors(derep, randomize = T, errorEstimationFunction = noqualErrfun)
-
-## "errorEstimationFunction" can take the value "loessErrfun" if you want to use
-## the quality score of your sequence to build the model, or "noqualErrfun" if
-## you don't want it
+err <- learnErrors(derep, randomize = T)
 
 ## plot the estimated error rates :
-plotErrors(err1, nominalQ = T)
-plotErrors(err2, nominalQ = T)
+plotErrors(err, nominalQ = T)
 
 ## eliminate the false sequences according to the model :
-dadas1 <- dada(derep, err1)
-dadas2 <- dada(derep, err2)
+dadas <- dada(derep, err)
 
 ########################################################################
 # STEP 6 : Generate your final files
 
-## build the sequence tables :
-seqtab_avec_chimeres1 <- makeSequenceTable(dadas1)
-seqtab_avec_chimeres2 <- makeSequenceTable(dadas2)
+## build the sequence table :
+seqtab_with_bimeras <- makeSequenceTable(dadas)
 
-## create the ".fasta" files :
-uniqueSeqs1 <- getUniques(seqtab_avec_chimeres1)
-uniqueSeqs2 <- getUniques(seqtab_avec_chimeres2)
+## create the ".fasta" file :
+uniqueSeqs <- getUniques(seqtab_with_bimeras)
 
 ## extract the vectors from the table
 
-uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_avec_chimeres_loessErrfun.fasta")
-uniquesToFasta(uniqueSeqs2, "./dada2_and_obitools/ASVs_avec_chimeres_noqualErrfun.fasta")
+uniquesToFasta(uniqueSeqs, "./dada2_and_obitools/ASVs_with_bimeras.fasta")
 
 ########################################################################
-# STEP 7 : Removing chimeras
+# STEP 7 : Bimeras removal
 
-## remove bimeras ans repeat step 6 :
-seqtab_sans_chimeres1 <- removeBimeraDenovo(seqtab_avec_chimeres1, verbose = T)
-seqtab_sans_chimeres2 <- removeBimeraDenovo(seqtab_avec_chimeres2, verbose = T)
+## remove bimeras and repeat step 6 :
+seqtab_without_bimeras <- removeBimeraDenovo(seqtab_with_bimeras, verbose = T)
 
-uniqueSeqs1 <- getUniques(seqtab_sans_chimeres1)
-uniqueSeqs2 <- getUniques(seqtab_sans_chimeres2)
+uniqueSeqs1 <- getUniques(seqtab_without_bimeras)
 
-uniquesToFasta(uniqueSeqs1, "./dada2_and_obitools/ASVs_sans_chimeres_loessErrfun.fasta")
-uniquesToFasta(uniqueSeqs2, "./dada2_and_obitools/ASVs_sans_chimeres_noqualErrfun.fasta")
+uniquesToFasta(uniqueSeqs, "./dada2_and_obitools/ASVs_without_bimeras.fasta")
