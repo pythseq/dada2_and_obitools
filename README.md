@@ -1,6 +1,6 @@
 # pipeline_using_obitools_and_dada2
 
-**Bastien Macé, 2020**
+**Bastien Macé, Clémence Raphael, 2020-2021**
 
 _________________________________
 
